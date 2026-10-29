@@ -1,13 +1,11 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import { Eye, EyeOff, Mail, Lock, Store } from "lucide-react";
 import api from "../services/api";
 
 function Login() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const [form, setForm] = useState({
     email: "",
@@ -35,10 +33,15 @@ function Login() {
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
-      navigate("/");
+      if (user.role === "admin") {
+        navigate("/admin", { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      }
     } catch (err) {
       setError(
-        err.response?.data?.message || "Unable to log in. Please try again."
+        err.response?.data?.message ||
+          "Unable to log in. Please try again."
       );
     } finally {
       setLoading(false);
@@ -49,7 +52,9 @@ function Login() {
     <main className="auth-page">
       <section className="auth-card">
         <Link to="/" className="shop-logo auth-logo">
-          <span className="logo-icon"><Store size={22} /></span>
+          <span className="logo-icon">
+            <Store size={22} />
+          </span>
           ShopEase
         </Link>
 
@@ -60,7 +65,10 @@ function Login() {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <label className="auth-label" htmlFor="email">Email address</label>
+          <label className="auth-label" htmlFor="email">
+            Email address
+          </label>
+
           <div className="auth-input-wrap">
             <Mail size={19} />
             <input
@@ -75,7 +83,10 @@ function Login() {
             />
           </div>
 
-          <label className="auth-label mt-3" htmlFor="password">Password</label>
+          <label className="auth-label mt-3" htmlFor="password">
+            Password
+          </label>
+
           <div className="auth-input-wrap">
             <Lock size={19} />
             <input
@@ -88,17 +99,28 @@ function Login() {
               autoComplete="current-password"
               required
             />
+
             <button
               type="button"
               className="password-toggle"
               onClick={() => setShowPassword(!showPassword)}
-              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-label={
+                showPassword ? "Hide password" : "Show password"
+              }
             >
-              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              {showPassword ? (
+                <EyeOff size={18} />
+              ) : (
+                <Eye size={18} />
+              )}
             </button>
           </div>
 
-          {error && <div className="alert alert-danger mt-3">{error}</div>}
+          {error && (
+            <div className="alert alert-danger mt-3">
+              {error}
+            </div>
+          )}
 
           <button
             className="btn shop-primary auth-submit"
