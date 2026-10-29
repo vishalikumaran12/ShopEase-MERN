@@ -11,13 +11,17 @@ import {
   ChevronDown,
   User,
 } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { clearCart } from "../redux/cartSlice";
 
 function Navbar() {
   const [profileOpen, setProfileOpen] = useState(false);
+
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const cartItems = useSelector((state) => state.cart.items);
+
   const cartQuantity = cartItems.reduce(
     (total, item) => total + item.quantity,
     0
@@ -28,8 +32,14 @@ function Navbar() {
   const user = savedUser ? JSON.parse(savedUser) : null;
 
   const handleLogout = () => {
+    // Clear cart from Redux and Redux Persist
+    dispatch(clearCart());
+
+    // Remove logged-in user information
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+
+    // Close profile menu and redirect to login
     setProfileOpen(false);
     navigate("/login");
   };
@@ -95,6 +105,7 @@ function Navbar() {
                   <div className="fw-semibold">
                     {user?.name || "Welcome!"}
                   </div>
+
                   <small className="text-muted">
                     {user?.email || "Guest user"}
                   </small>
@@ -121,6 +132,7 @@ function Navbar() {
                     </Link>
 
                     <button
+                      type="button"
                       className="dropdown-item rounded-2 py-2 d-flex align-items-center gap-2 text-danger"
                       onClick={handleLogout}
                     >
